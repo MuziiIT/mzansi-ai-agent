@@ -1,0 +1,9 @@
+scikit-learn==1.5.2
+pandas
+numpy
+beautifulsoup4
+requests
+firebase-admin
+joblib
+python-dotenv
+google-genai
