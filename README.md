@@ -1,5 +1,5 @@
 Markdown
-# Mzansi Bursaries AI Agent 🤖🎓
+# Mzansi Bursaries AI Agent 
 
 An autonomous Artificial Intelligence pipeline designed to protect South African students from fraudulent educational funding schemes while eliminating manual data entry for administrators. 
 
@@ -7,7 +7,7 @@ This agent crawls target bursary websites, evaluates the legitimacy of the oppor
 
 ---
 
-## 🧠 AI & Machine Learning Architecture
+##  AI & Machine Learning Architecture
 
 This project practically applies core Machine Learning concepts to solve a real-world problem:
 
@@ -17,7 +17,7 @@ This project practically applies core Machine Learning concepts to solve a real-
 
 ---
 
-## ⚙️ System Components
+##  System Components
 
 1. **`scraper.py`**: A BeautifulSoup4 web spider that securely extracts readable text from target URLs.
 2. **`classifier.py`**: Loads `scam_classifier.joblib` to calculate a Scam Probability Score.
@@ -30,7 +30,7 @@ This project practically applies core Machine Learning concepts to solve a real-
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 * Python 3.11+
@@ -68,7 +68,7 @@ Plaintext
 GEMINI_API_KEY=your_actual_api_key_here
 (Note: Both .env and serviceAccountKey.json are strictly ignored by Git to prevent credential leakage).
 
-🛠️ Usage
+ Usage
 Testing (Dry-Run Mode)
 It is highly recommended to test new target URLs before pushing data to the live database.
 
@@ -91,7 +91,7 @@ Set DRY_RUN = False.
 
 Run the script to automatically publish the verified bursary to the student front-end.
 
-Built for the BICT332 / DICT312 Group Project.
+Built for the BICT332  Group Project.
 
 
 ***
