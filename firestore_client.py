@@ -11,46 +11,53 @@ if not firebase_admin._apps:
     firebase_admin.initialize_app(cred)
 db = firestore.client()
 
+# AI-created bursaries are staged here for admin review — NOT the same
+# collection the public site reads from. Nothing lands on the live site
+# until an admin approves it and it gets copied into BURSARIES_COLLECTION.
+AI_BURSARIES_COLLECTION = "ai_bursaries"
+BURSARIES_COLLECTION = "bursaries"
+
 
 def bursary_exists(source_url: str) -> bool:
-    # Uses the current filter= keyword syntax instead of the deprecated
-    # positional (field, op, value) form — same behavior, no deprecation
-    # warning.
-    docs = (
-        db.collection("bursaries")
-        .where(filter=FieldFilter("source_url", "==", source_url))
-        .limit(1)
-        .stream()
-    )
-    return len(list(docs)) > 0
+    """Checks both collections — a URL already sitting in ai_bursaries
+    (awaiting review) or already promoted into the live bursaries
+    collection should both count as 'already have this one'."""
+    for collection in (AI_BURSARIES_COLLECTION, BURSARIES_COLLECTION):
+        docs = (
+            db.collection(collection)
+            .where(filter=FieldFilter("source_url", "==", source_url))
+            .limit(1)
+            .stream()
+        )
+        if len(list(docs)) > 0:
+            return True
+    return False
 
 
 def push_bursary(data: dict, status: str, scam_score: float, source_url: str):
-    # The extracted 'deadline' comes in as free text (e.g. "31 August 2026").
-    # Convert it to a real Timestamp to match the live site's existing
-    # schema — the original text is kept separately as 'deadline_text' so
-    # nothing human-readable is lost, but 'deadline' itself is now a date
-    # any Flask query can actually filter/sort on.
+    # Internal verdict stays "approved"/"flagged" everywhere in code and
+    # logs. Only the stored Firestore value is remapped: "approved" -> "legit".
+    STATUS_DB_VALUES = {"approved": "legit", "flagged": "flagged"}
+    db_status = STATUS_DB_VALUES.get(status, status)
+
     deadline_text = data.pop("deadline", "")
     doc = {
         **data,
         "deadline": deadline_to_timestamp(deadline_text),
         "deadline_text": deadline_text,
         "source_url": source_url,
-        "status": status,
+        "status": db_status,
         "scam_score": scam_score,
         "createdAt": firestore.SERVER_TIMESTAMP,
     }
 
     try:
-        update_time, doc_ref = db.collection("bursaries").add(doc)
+        update_time, doc_ref = db.collection(AI_BURSARIES_COLLECTION).add(doc)
     except Exception as e:
-        # Don't let one bad write kill the whole run — surface it clearly
-        # and let the caller decide what to do (e.g. skip and move on).
         print(f"[-] Firestore write failed for {source_url}: {e}")
         raise
 
-    print(f"[DEBUG] Document written with ID: {doc_ref.id}")
+    print(f"[DEBUG] Document written to '{AI_BURSARIES_COLLECTION}' with ID: {doc_ref.id}")
     return doc_ref.id
 
 
