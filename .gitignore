@@ -1,6 +1,21 @@
-venv/
+# --- Secrets — NEVER commit these ------------------------------------------
 serviceAccountKey.json
 .env
+*.env
+quota_state.json
+
+# --- Python ------------------------------------------------------------------
 __pycache__/
 *.pyc
+.venv/
+venv/
+*.egg-info/
+
+# --- Logs and local run artifacts --------------------------------------------
 logs/
+pipeline_run_log.json
+
+# --- OS/editor clutter ---------------------------------------------------------
+.DS_Store
+Thumbs.db
+.vscode/
