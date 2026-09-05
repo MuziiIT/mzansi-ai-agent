@@ -7,3 +7,5 @@ firebase-admin
 joblib
 python-dotenv
 google-genai
+ddgs
+lxml
